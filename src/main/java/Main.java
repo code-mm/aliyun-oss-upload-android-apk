@@ -140,32 +140,38 @@ public class Main {
         System.out.println("准备上传OSS");
         for (String it : fileList) {
 
-            System.out.println("正在上传 " + it);
-            String fileName = it;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            if(it.contains("-release"))
+            {
+                System.out.println("正在上传 " + it);
+                String fileName = it;
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 //            // 获取文件的后缀名
-            String suffixName = fileName.substring(fileName.lastIndexOf("."));
-            // 生成上传文件名
-            File file = new File(it);
+                String suffixName = fileName.substring(fileName.lastIndexOf("."));
+                // 生成上传文件名
+                File file = new File(it);
 
-            String finalFileName = file.getName() + new SecureRandom().nextInt(0x0400) + suffixName;
-            String objectName = sdf.format(new Date()) + "/" + finalFileName;
+                String finalFileName = file.getName() + new SecureRandom().nextInt(0x0400) + suffixName;
+              //  String objectName = sdf.format(new Date()) + "/" + finalFileName;
+                String objectName =  file.getName();
 
-            OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
+                OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
 
-            PutObjectResult putObjectResult = ossClient.putObject(bucketName, objectName, file);
-            // 设置URL过期时间为24小时。
-            Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000 * 24 * 7);
-            // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。
-            URL url = ossClient.generatePresignedUrl(bucketName, objectName, expiration);
+                PutObjectResult putObjectResult = ossClient.putObject(bucketName, objectName, file);
+                // 设置URL过期时间为24小时。
+                Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000 * 24 * 7);
+                // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。
+                URL url = ossClient.generatePresignedUrl(bucketName, objectName, expiration);
 
 
-            ossClient.shutdown();
-            System.out.println("文件下载地址为 : " + url.toString());
+                ossClient.shutdown();
+                System.out.println("文件下载地址为 : " + url.toString());
 
-            String s = "Hi All " + file.getName() + " 打包成功 \n下载地址 : " + url.toString();
-            System.out.println("通知钉钉机器人");
-            sendDingDing(s);
+                String s = " \uD83D\uDE19 " + file.getName() + " 打包成功 \n下载地址 : \n " + url.toString().substring(0,url.toString().indexOf("?"));
+                System.out.println("通知钉钉机器人");
+                sendDingDing(s);
+            }
+
+
         }
     }
 
